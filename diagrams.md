@@ -121,8 +121,9 @@ classDiagram
     Location "1" -- "0..*" Game : is at
 ```
 
-## Sequence Diagram
+## Sequence Diagrams
 
+### Join a Game
 ```mermaid
 sequenceDiagram
     participant User
@@ -138,4 +139,22 @@ sequenceDiagram
     Database-->>Backend: Success
     Backend->>Frontend: 200 OK { message: "Successfully joined game" }
     Frontend->>User: Display "Successfully joined game"
+```
+
+### Post a Game
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant Database
+
+    User->>Frontend: Fills out "Create Game" form
+    User->>Frontend: Clicks "Create Game"
+    Frontend->>Backend: POST /api/games (gameData)
+    Backend->>Backend: Validate game data
+    Backend->>Database: INSERT INTO games (creator_id, sport_id, title, ...) VALUES (...)
+    Database-->>Backend: New game ID
+    Backend->>Frontend: 201 Created { message: "Game created successfully", gameId: ... }
+    Frontend->>User: Display "Game created successfully"
 ```
