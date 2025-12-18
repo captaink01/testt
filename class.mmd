@@ -1,0 +1,50 @@
+classDiagram
+    class User {
+        -id: Integer
+        -fullName: String
+        -email: String
+        -password: String
+        -phone: String
+        +register()
+        +login()
+        +createGame()
+        +joinGame()
+        +leaveGame()
+    }
+
+    class Game {
+        -id: Integer
+        -creatorId: Integer
+        -sportId: Integer
+        -title: String
+        -description: String
+        -location: String
+        -date: String
+        -time: String
+        -playersNeeded: Integer
+        -currentPlayers: Integer
+        -status: String
+        +addPlayer()
+        +removePlayer()
+        +updateStatus()
+    }
+
+    class Sport {
+        -id: Integer
+        -name: String
+        -icon: String
+    }
+
+    class Location {
+        -id: Integer
+        -name: String
+        -description: String
+        -address: String
+        -facilities: String
+        -availableSports: String
+    }
+
+    User "1" -- "0..*" Game : creates
+    User "1" -- "0..*" Game : joins
+    Sport "1" -- "0..*" Game : is of type
+    Location "1" -- "0..*" Game : is at
