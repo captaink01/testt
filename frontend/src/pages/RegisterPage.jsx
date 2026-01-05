@@ -1,20 +1,20 @@
 // src/pages/RegisterPage.jsx
-import { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const { register } = useContext(AuthContext);
-  
+
   const [formData, setFormData] = useState({
-    full_name: '',
-    email: '',
-    password: '',
-    confirm_password: '',
-    phone: '',
+    full_name: "",
+    email: "",
+    password: "",
+    confirm_password: "",
+    phone: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -23,33 +23,32 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     if (formData.password !== formData.confirm_password) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       setLoading(false);
       return;
     }
 
     const { confirm_password, ...registerData } = formData;
-    
+
     const result = await register(registerData);
-    
+
     if (result.success) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     } else {
       setError(result.message);
     }
-    
+
     setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-900 px-4 py-12">
-      {/* Exact same glassmorphism card as Login – 100% consistent */}
+     
       <div className="max-w-md w-full bg-white/25 backdrop-blur-3xl border border-white/40 rounded-3xl shadow-2xl p-8 md:p-10 transition-all duration-500 ring-1 ring-white/20">
-        
         <div className="text-center mb-10">
           <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg">
             Campus Sports Connect
@@ -145,13 +144,16 @@ const RegisterPage = () => {
             disabled={loading}
             className="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold py-5 px-6 rounded-2xl shadow-2xl hover:shadow-3xl hover:shadow-blue-500/60 transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-400/50 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 text-lg tracking-wide"
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
         <p className="mt-8 text-center text-white/80 text-sm font-medium">
-          Already have an account?{' '}
-          <Link to="/login" className="text-blue-400 hover:text-white font-bold underline underline-offset-4 decoration-2 hover:decoration-4 transition-all duration-300">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-blue-400 hover:text-white font-bold underline underline-offset-4 decoration-2 hover:decoration-4 transition-all duration-300"
+          >
             Sign in
           </Link>
         </p>

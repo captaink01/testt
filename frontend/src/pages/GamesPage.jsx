@@ -61,15 +61,10 @@ const GamesPage = () => {
             Browse Games
           </h1>
           
-          {/* <Link
-            to="/create-game"
-            className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold py-5 px-10 rounded-2xl shadow-2xl hover:shadow-3xl hover:shadow-blue-500/60 transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-400/50 transition-all duration-300 text-xl tracking-wide"
-          >
-            ➕ Create Game
-          </Link> */}
+          
         </div>
 
-        {/* Custom Styled Sport Filter Dropdown */}
+        {/*  Sport Filter Dropdown */}
         <div className="relative max-w-md mb-12">
           <div className="text-xl font-bold text-white mb-4">Filter by Sport</div>
           
@@ -161,7 +156,7 @@ const GamesPage = () => {
                     </span>
                   </div>
 
-                  {/* Improved typography – elegant, not just "big and bold" */}
+                 
                   <h3 className="text-2xl font-extrabold text-white mb-2 group-hover:text-blue-300 transition-colors duration-300 tracking-tight">
                     {game.title}
                   </h3>

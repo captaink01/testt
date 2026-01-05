@@ -58,7 +58,7 @@ const NavBar = () => {
 
           {/* User Section + Mobile Menu Button */}
           <div className="flex items-center gap-6">
-            {/* Logout Button - exact same style as Sign In button */}
+            {/* Logout Button - */}
             <button
               onClick={handleLogout}
               className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold py-3 px-7 rounded-2xl shadow-2xl hover:shadow-3xl hover:shadow-blue-500/60 transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-400/50 transition-all duration-300 text-lg tracking-wide"
@@ -81,7 +81,7 @@ const NavBar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu - drops down with same glass effect */}
+      {/* Mobile Menu  */}
       <div className={`lg:hidden absolute top-full left-0 right-0 bg-blue-950/95 backdrop-blur-3xl border-b border-white/40 shadow-2xl transition-all duration-500 overflow-hidden ${isMobileMenuOpen ? 'max-h-96 py-6' : 'max-h-0 py-0'}`}>
         <div className="px-6 space-y-4">
           {navLinks.map((link) => (
