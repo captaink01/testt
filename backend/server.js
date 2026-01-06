@@ -7,8 +7,28 @@ const { initDatabase } = require('./src/config/database');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// CORS Configuration for production
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  process.env.FRONTEND_URL || 'https://campus-sports-connect.onrender.com'
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all for now, restrict later
+    }
+  },
+  credentials: true
+}));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -58,7 +78,7 @@ async function startServer() {
       console.log(`   - GET  http://localhost:${PORT}/api/users/my-sports`);
       console.log(`   - PUT  http://localhost:${PORT}/api/users/sports-preferences`);
       console.log(`   - PUT  http://localhost:${PORT}/api/users/profile`);
-         console.log(`🎮 Game endpoints:`);
+      console.log(`🎮 Game endpoints:`);
       console.log(`   - GET  http://localhost:${PORT}/api/games`);
       console.log(`   - POST http://localhost:${PORT}/api/games`);
       console.log(`   - GET  http://localhost:${PORT}/api/games/:id`);
