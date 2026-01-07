@@ -29,7 +29,7 @@ const NavBar = () => {
           {/* Logo */}
           <NavLink to="/dashboard" className="flex items-center gap-3 group">
             <span className="text-4xl group-hover:scale-110 transition-transform duration-300">⚽</span>
-            <span className="text-2xl font-black text-white tracking-tight hidden sm:block">
+            <span className="text-xl sm:text-2xl font-black text-white tracking-tight">
               Campus Sports Connect
             </span>
           </NavLink>
@@ -61,7 +61,7 @@ const NavBar = () => {
             {/* Logout Button - */}
             <button
               onClick={handleLogout}
-              className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold py-3 px-7 rounded-2xl shadow-2xl hover:shadow-3xl hover:shadow-blue-500/60 transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-400/50 transition-all duration-300 text-lg tracking-wide"
+              className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold py-2 px-5 rounded-2xl shadow-2xl hover:shadow-3xl hover:shadow-blue-500/60 transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-400/50 transition-all duration-300 text-base tracking-wide"
             >
               Logout
             </button>
