@@ -1,5 +1,11 @@
-[dotenv@17.2.3] injecting env (2) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
-✅ Connected to existing database
+[dotenv@17.2.3] injecting env (2) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+✅ Created new database
+✅ Users table created
+✅ Sports table created
+✅ User sports table created
+✅ Games table created
+✅ Game participants table created
+✅ Locations table created
 ✅ Database initialized successfully
 🚀 Server running on http://localhost:5000
 📊 API Health: http://localhost:5000/api/health
@@ -24,6 +30,8 @@
 📍 Location endpoints:
    - GET  http://localhost:5000/api/locations
    - GET  http://localhost:5000/api/locations/:id
-✅ Database saved to file
+✅ Admin user seeded (admin@buk.edu.ng / adminpassword123)
+✅ Sports data seeded
+✅ Locations data seeded
 ✅ Database saved to file
 ✅ Database saved to file
