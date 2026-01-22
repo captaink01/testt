@@ -1,10 +1,12 @@
 // src/pages/GamesPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { gamesAPI, userAPI } from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 import Navbar from '../components/NavBar';
 
 const GamesPage = () => {
+  const { user } = useContext(AuthContext);
   const [games, setGames] = useState([]);
   const [sports, setSports] = useState([]);
   const [selectedSport, setSelectedSport] = useState('');
@@ -61,12 +63,14 @@ const GamesPage = () => {
             Browse Games
           </h1>
           
-          {/* <Link
-            to="/create-game"
-            className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold py-5 px-10 rounded-2xl shadow-2xl hover:shadow-3xl hover:shadow-blue-500/60 transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-400/50 transition-all duration-300 text-xl tracking-wide"
-          >
-            ➕ Create Game
-          </Link> */}
+          {(user?.role === 'student_creator' || user?.role === 'admin') && (
+            <Link
+              to="/create-game"
+              className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold py-5 px-10 rounded-2xl shadow-2xl hover:shadow-3xl hover:shadow-blue-500/60 transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-400/50 transition-all duration-300 text-xl tracking-wide"
+            >
+              ➕ Create Game
+            </Link>
+          )}
         </div>
 
         {/* Custom Styled Sport Filter Dropdown */}

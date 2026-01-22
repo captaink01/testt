@@ -9,7 +9,8 @@ const RegisterPage = () => {
   
   const [formData, setFormData] = useState({
     full_name: '',
-    email: '',
+    reg_number: '',
+    role: 'student_player',
     password: '',
     confirm_password: '',
     phone: '',
@@ -83,17 +84,32 @@ const RegisterPage = () => {
 
           <div>
             <label className="block text-sm font-semibold text-white/95 mb-2">
-              Email
+              Registration Number
             </label>
             <input
-              type="email"
-              name="email"
+              type="text"
+              name="reg_number"
               required
-              value={formData.email}
+              value={formData.reg_number}
               onChange={handleChange}
               className="w-full px-5 py-4 bg-white/20 border border-white/50 rounded-2xl text-white placeholder-white/60 focus:outline-none focus:border-blue-400 focus:bg-white/30 focus:ring-4 focus:ring-blue-400/40 transition-all duration-300 backdrop-blur-sm shadow-inner"
-              placeholder="your.email@buk.edu.ng"
+              placeholder="CST/21/SWE/00674"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-white/95 mb-2">
+              Role
+            </label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full px-5 py-4 bg-white/20 border border-white/50 rounded-2xl text-white focus:outline-none focus:border-blue-400 focus:bg-white/30 focus:ring-4 focus:ring-blue-400/40 transition-all duration-300 backdrop-blur-sm shadow-inner appearance-none"
+            >
+              <option value="student_player" className="bg-indigo-900 text-white">Student (Join Games)</option>
+              <option value="student_creator" className="bg-indigo-900 text-white">Student (Create Games)</option>
+            </select>
           </div>
 
           <div>

@@ -49,3 +49,27 @@ exports.protect = (req, res, next) => {
     });
   }
 };
+
+// Admin only middleware
+exports.isAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'Access denied. Admin only resource'
+    });
+  }
+};
+
+// Creator only middleware (Admin is also allowed)
+exports.isCreator = (req, res, next) => {
+  if (req.user && (req.user.role === 'student_creator' || req.user.role === 'admin')) {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'Access denied. Only game creators can perform this action'
+    });
+  }
+};

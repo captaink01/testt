@@ -12,14 +12,14 @@ const {
   getMyGames,
   getJoinedGames
 } = require('../controllers/gameController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, isCreator } = require('../middleware/authMiddleware');
 
 // Public routes
 router.get('/', getAllGames);
 router.get('/:id', getGameById);
 
 // Protected routes (require authentication)
-router.post('/', protect, createGame);
+router.post('/', protect, isCreator, createGame);
 router.put('/:id', protect, updateGame);
 router.delete('/:id', protect, deleteGame);
 router.post('/:id/join', protect, joinGame);

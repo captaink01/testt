@@ -30,15 +30,17 @@ async function initDatabase() {
 }
 
 // Create all tables
-function createTables() {
+async function createTables() {
   try {
     // Users table
     db.run(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         full_name TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE,
+        reg_number TEXT UNIQUE,
         password TEXT NOT NULL,
+        role TEXT DEFAULT 'student_player',
         phone TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
@@ -117,7 +119,7 @@ function createTables() {
     console.log('✅ Locations table created');
 
     // Seed initial data
-    seedInitialData();
+    await seedInitialData();
     
     // Save database to file
     saveDatabase();
@@ -127,7 +129,24 @@ function createTables() {
 }
 
 // Seed initial sports data
-function seedInitialData() {
+async function seedInitialData() {
+  const bcrypt = require('bcrypt');
+
+  // Seed admin user
+  try {
+    const adminPassword = 'adminpassword123';
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(adminPassword, salt);
+
+    db.run(
+      'INSERT OR IGNORE INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)',
+      ['System Admin', 'admin@buk.edu.ng', hashedPassword, 'admin']
+    );
+    console.log('✅ Admin user seeded (admin@buk.edu.ng / adminpassword123)');
+  } catch (err) {
+    console.error('Error seeding admin:', err);
+  }
+
   const sports = [
     { name: 'Football', icon: '⚽' },
     { name: 'Basketball', icon: '🏀' },

@@ -72,7 +72,12 @@ const DashboardPage = () => {
             Welcome back, {user?.full_name}!
           </h2>
           <div className="space-y-3 text-white/90 text-lg font-medium">
-            <p><span className="text-white/70">Email:</span> {user?.email}</p>
+            {user?.email && <p><span className="text-white/70">Email:</span> {user?.email}</p>}
+            {user?.reg_number && <p><span className="text-white/70">Reg No:</span> {user?.reg_number}</p>}
+            <p><span className="text-white/70">Role:</span> {
+              user?.role === 'admin' ? 'Administrator' :
+              user?.role === 'student_creator' ? 'Student (Creator)' : 'Student (Player)'
+            }</p>
             {user?.phone && <p><span className="text-white/70">Phone:</span> {user?.phone}</p>}
             <p className="text-white/70 text-base mt-6">
               Member since {new Date(user?.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}

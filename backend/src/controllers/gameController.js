@@ -166,7 +166,7 @@ exports.updateGame = (req, res) => {
       });
     }
 
-    if (game.creator_id !== userId) {
+    if (game.creator_id !== userId && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'You are not authorized to update this game'
@@ -227,7 +227,7 @@ exports.deleteGame = (req, res) => {
       });
     }
 
-    if (game.creator_id !== userId) {
+    if (game.creator_id !== userId && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'You are not authorized to delete this game'
