@@ -54,6 +54,7 @@ export const gamesAPI = {
   leaveGame: (id) => api.post(`/games/${id}/leave`),
   getMyGames: () => api.get('/games/my/created'),
   getJoinedGames: () => api.get('/games/my/joined'),
+  updateGameStatus: (id, admin_status) => api.patch(`/games/${id}/status`, { admin_status }),
 };
 
 // Locations API calls

@@ -24,6 +24,12 @@ const NavBar = () => {
     },
     { label: 'My Games', path: '/my-games', icon: '📋' },
     { label: 'Locations', path: '/locations', icon: '📍' },
+    {
+      label: 'Admin Control',
+      path: '/admin',
+      icon: '🛡️',
+      roles: ['admin']
+    },
   ].filter(link => !link.roles || link.roles.includes(user?.role));
 
   return (

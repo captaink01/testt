@@ -1,6 +1,23 @@
 // src/middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 
+// Middleware to extract user if token exists (doesn't block)
+exports.optionalAuth = (req, res, next) => {
+  try {
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded;
+    }
+    next();
+  } catch (error) {
+    next();
+  }
+};
+
 // Protect routes - verify JWT token
 exports.protect = (req, res, next) => {
   try {

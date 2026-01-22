@@ -93,7 +93,7 @@ exports.register = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: newUser.id, email: newUser.email, reg_number: newUser.reg_number, role: newUser.role },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'fallback_secret_key_12345',
       { expiresIn: '7d' }
     );
 
@@ -105,10 +105,10 @@ exports.register = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get profile error:', error);
+    console.error('Registration error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error fetching profile',
+      message: 'Server error during registration',
       error: error.message
     });
   }
@@ -218,7 +218,7 @@ exports.login = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email, reg_number: user.reg_number, role: user.role },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'fallback_secret_key_12345',
       { expiresIn: '7d' }
     );
 

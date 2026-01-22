@@ -84,6 +84,7 @@ async function createTables() {
         players_needed INTEGER NOT NULL,
         current_players INTEGER DEFAULT 0,
         status TEXT DEFAULT 'open',
+        admin_status TEXT DEFAULT 'pending',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (sport_id) REFERENCES sports(id)
