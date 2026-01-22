@@ -1,8 +1,4 @@
-
-> backend@1.0.0 start
-> node server.js
-
-[dotenv@17.2.3] injecting env (3) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (2) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
 ✅ Created new database
 ✅ Users table created
 ✅ Sports table created
@@ -37,9 +33,5 @@
 ✅ Admin user seeded (admin@buk.edu.ng / adminpassword123)
 ✅ Sports data seeded
 ✅ Locations data seeded
-✅ Database saved to file
-✅ Database saved to file
-✅ Database saved to file
-✅ Database saved to file
 ✅ Database saved to file
 ✅ Database saved to file

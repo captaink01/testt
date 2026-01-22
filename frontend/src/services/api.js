@@ -31,6 +31,7 @@ export const authAPI = {
   register: (userData) => api.post('/auth/register', userData),
   login: (credentials) => api.post('/auth/login', credentials),
   getProfile: () => api.get('/auth/profile'),
+  createAdmin: (adminData) => api.post('/auth/create-admin', adminData),
 };
 
 // User API calls
@@ -53,6 +54,7 @@ export const gamesAPI = {
   leaveGame: (id) => api.post(`/games/${id}/leave`),
   getMyGames: () => api.get('/games/my/created'),
   getJoinedGames: () => api.get('/games/my/joined'),
+  updateGameStatus: (id, admin_status) => api.patch(`/games/${id}/status`, { admin_status }),
 };
 
 // Locations API calls

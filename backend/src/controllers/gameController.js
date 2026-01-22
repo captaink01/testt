@@ -15,10 +15,10 @@ exports.createGame = (req, res) => {
       });
     }
 
-    // Insert game
+    // Insert game (Defaults to pending admin approval)
     const result = runQuery(
-      `INSERT INTO games (creator_id, sport_id, title, description, location, date, time, players_needed, current_players, status) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'open')`,
+      `INSERT INTO games (creator_id, sport_id, title, description, location, date, time, players_needed, current_players, status, admin_status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'open', 'pending')`,
       [userId, sport_id, title, description || '', location, date, time, players_needed]
     );
 
@@ -52,7 +52,8 @@ exports.createGame = (req, res) => {
 // Get all games
 exports.getAllGames = (req, res) => {
   try {
-    const { sport_id, status } = req.query;
+    const { sport_id, status, admin_status } = req.query;
+    const userRole = req.user ? req.user.role : null;
 
     let sql = `
       SELECT g.*, 
@@ -65,6 +66,15 @@ exports.getAllGames = (req, res) => {
       WHERE 1=1
     `;
     const params = [];
+
+    // Filter by admin_status
+    // If user is not admin, only show approved games by default
+    if (userRole !== 'admin') {
+      sql += " AND g.admin_status = 'approved'";
+    } else if (admin_status) {
+      sql += ' AND g.admin_status = ?';
+      params.push(admin_status);
+    }
 
     if (sport_id) {
       sql += ' AND g.sport_id = ?';
@@ -91,6 +101,46 @@ exports.getAllGames = (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error fetching games',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Update Game Status (Approve/Reject)
+exports.updateGameStatus = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { admin_status } = req.body;
+
+    if (!['approved', 'rejected', 'pending'].includes(admin_status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status'
+      });
+    }
+
+    const result = runQuery(
+      'UPDATE games SET admin_status = ? WHERE id = ?',
+      [admin_status, id]
+    );
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to update game status'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Game ${admin_status} successfully`
+    });
+
+  } catch (error) {
+    console.error('Update status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error updating status',
       error: error.message
     });
   }
