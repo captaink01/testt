@@ -105,6 +105,71 @@ exports.register = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching profile',
+      error: error.message
+    });
+  }
+};
+
+// Create a new admin user (Protected: Admin only)
+exports.createAdmin = async (req, res) => {
+  try {
+    const { full_name, email, password } = req.body;
+
+    if (!full_name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide full name, email, and password'
+      });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long'
+      });
+    }
+
+    const existingUser = getOne('SELECT * FROM users WHERE email = ?', [email]);
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const result = runQuery(
+      'INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)',
+      [full_name, email, hashedPassword, 'admin']
+    );
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to create admin account'
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Admin account created successfully'
+    });
+
+  } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({
       success: false,
