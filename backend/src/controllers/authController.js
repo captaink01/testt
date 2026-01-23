@@ -1,27 +1,44 @@
 // src/controllers/authController.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { runQuery, getOne, saveDatabase } = require('../config/database');
+const { runQuery, getOne, getQuery, saveDatabase } = require('../config/database');
 
 // Register new user
 exports.register = async (req, res) => {
   try {
-    const { full_name, email, password, phone } = req.body;
+    const { full_name, email, registration_number, password, phone, role } = req.body;
 
     // Validation
-    if (!full_name || !email || !password) {
+    if (!full_name || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide full name, email, and password'
+        message: 'Please provide full name and password'
       });
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Role validation
+    const validRoles = ['player', 'organizer'];
+    if (role && !validRoles.includes(role)) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a valid email address'
+        message: 'Invalid role. Must be either "player" or "organizer"'
+      });
+    }
+
+    // Students must provide registration number
+    if (!registration_number) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide registration number'
+      });
+    }
+
+    // Validate registration number format (CST/21/SWE/00674)
+    const regNumberRegex = /^[A-Z]{3}\/\d{2}\/[A-Z]{3}\/\d{5}$/;
+    if (!regNumberRegex.test(registration_number)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid registration number format. Expected format: CST/21/SWE/00674'
       });
     }
 
@@ -33,12 +50,12 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Check if user already exists
-    const existingUser = getOne('SELECT * FROM users WHERE email = ?', [email]);
+    // Check if registration number already exists
+    const existingUser = getOne('SELECT * FROM users WHERE registration_number = ?', [registration_number]);
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'User with this email already exists'
+        message: 'User with this registration number already exists'
       });
     }
 
@@ -48,8 +65,8 @@ exports.register = async (req, res) => {
 
     // Insert user into database
     const result = runQuery(
-      'INSERT INTO users (full_name, email, password, phone) VALUES (?, ?, ?, ?)',
-      [full_name, email, hashedPassword, phone || null]
+      'INSERT INTO users (full_name, email, registration_number, password, phone, role) VALUES (?, ?, ?, ?, ?, ?)',
+      [full_name, email || null, registration_number, hashedPassword, phone || null, role || 'player']
     );
 
     if (!result.success) {
@@ -60,11 +77,11 @@ exports.register = async (req, res) => {
     }
 
     // Get the newly created user
-    const newUser = getOne('SELECT id, full_name, email, phone, created_at FROM users WHERE email = ?', [email]);
+    const newUser = getOne('SELECT id, full_name, email, registration_number, phone, role, created_at FROM users WHERE registration_number = ?', [registration_number]);
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: newUser.id, email: newUser.email },
+      { userId: newUser.id, email: newUser.email, role: newUser.role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -86,42 +103,59 @@ exports.register = async (req, res) => {
   }
 };
 
-// Login user
+// Login user (unified - supports registration number or email)
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
     // Validation
-    if (!email || !password) {
+    if (!identifier || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password'
+        message: 'Please provide registration number/email and password'
       });
     }
 
-    // Find user
-    const user = getOne('SELECT * FROM users WHERE email = ?', [email]);
-    
+    // Detect if identifier is email or registration number
+    const isEmail = identifier.includes('@');
+    let user;
+
+    if (isEmail) {
+      // Admin login with email
+      user = getOne('SELECT * FROM users WHERE email = ?', [identifier]);
+    } else {
+      // Student login with registration number
+      user = getOne('SELECT * FROM users WHERE registration_number = ?', [identifier]);
+    }
+
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Invalid credentials'
+      });
+    }
+
+    // Check if user is suspended
+    if (user.is_suspended === 1) {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been suspended. Please contact the administrator.'
       });
     }
 
     // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Invalid credentials'
       });
     }
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -153,7 +187,7 @@ exports.getProfile = (req, res) => {
 
     // Get user info
     const user = getOne(
-      'SELECT id, full_name, email, phone, created_at FROM users WHERE id = ?',
+      'SELECT id, full_name, email, registration_number, phone, role, is_suspended, created_at FROM users WHERE id = ?',
       [userId]
     );
 
@@ -190,6 +224,3 @@ exports.getProfile = (req, res) => {
     });
   }
 };
-
-// Need to import getQuery function
-const { getQuery } = require('../config/database');

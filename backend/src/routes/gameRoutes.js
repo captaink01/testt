@@ -12,19 +12,19 @@ const {
   getMyGames,
   getJoinedGames
 } = require('../controllers/gameController');
-const { protect } = require('../middleware/authMiddleware');
+const { verifyToken, requireOrganizer, checkSuspension } = require('../middleware/authMiddleware');
 
-// Public routes
+// Public routes (with optional auth for filtering)
 router.get('/', getAllGames);
 router.get('/:id', getGameById);
 
 // Protected routes (require authentication)
-router.post('/', protect, createGame);
-router.put('/:id', protect, updateGame);
-router.delete('/:id', protect, deleteGame);
-router.post('/:id/join', protect, joinGame);
-router.post('/:id/leave', protect, leaveGame);
-router.get('/my/created', protect, getMyGames);
-router.get('/my/joined', protect, getJoinedGames);
+router.post('/', verifyToken, checkSuspension, requireOrganizer, createGame);
+router.put('/:id', verifyToken, checkSuspension, updateGame);
+router.delete('/:id', verifyToken, checkSuspension, deleteGame);
+router.post('/:id/join', verifyToken, checkSuspension, joinGame);
+router.post('/:id/leave', verifyToken, checkSuspension, leaveGame);
+router.get('/my/created', verifyToken, checkSuspension, getMyGames);
+router.get('/my/joined', verifyToken, checkSuspension, getJoinedGames);
 
 module.exports = router;

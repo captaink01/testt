@@ -8,7 +8,7 @@ const LoginPage = () => {
   const { login } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -26,7 +26,12 @@ const LoginPage = () => {
     const result = await login(formData);
 
     if (result.success) {
-      navigate("/dashboard");
+      // Route based on user role
+      if (result.user.role === 'admin') {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } else {
       setError(result.message);
     }
@@ -36,7 +41,7 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-900 px-4 py-12">
-      
+
       <div className="max-w-md w-full bg-white/25 backdrop-blur-3xl border border-white/40 rounded-3xl shadow-2xl p-8 md:p-10 transition-all duration-500 ring-1 ring-white/20">
         <div className="text-center mb-10">
           <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg">
@@ -56,17 +61,20 @@ const LoginPage = () => {
         <form onSubmit={handleSubmit} className="space-y-7">
           <div className="relative">
             <label className="block text-sm font-semibold text-white/95 mb-2">
-              Email
+              Registration Number or Email
             </label>
             <input
-              type="email"
-              name="email"
+              type="text"
+              name="identifier"
               required
-              value={formData.email}
+              value={formData.identifier}
               onChange={handleChange}
               className="w-full px-5 py-4 bg-white/20 border border-white/50 rounded-2xl text-white placeholder-white/60 focus:outline-none focus:border-blue-400 focus:bg-white/30 focus:ring-4 focus:ring-blue-400/40 transition-all duration-300 backdrop-blur-sm shadow-inner"
-              placeholder="your.email@buk.edu.ng"
+              placeholder="CST/21/SWE/00674 or admin@buk.edu.ng"
             />
+            <p className="mt-1 text-xs text-white/70">
+              Students: Use registration number • Admin: Use email
+            </p>
           </div>
 
           <div className="relative">

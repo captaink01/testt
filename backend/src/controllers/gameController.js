@@ -15,10 +15,10 @@ exports.createGame = (req, res) => {
       });
     }
 
-    // Insert game
+    // Insert game with pending approval status
     const result = runQuery(
-      `INSERT INTO games (creator_id, sport_id, title, description, location, date, time, players_needed, current_players, status) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'open')`,
+      `INSERT INTO games (creator_id, sport_id, title, description, location, date, time, players_needed, current_players, status, approval_status) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'open', 'pending')`,
       [userId, sport_id, title, description || '', location, date, time, players_needed]
     );
 
@@ -35,7 +35,7 @@ exports.createGame = (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Game created successfully',
+      message: 'Game created successfully! Waiting for admin approval.',
       game: newGame
     });
 
@@ -53,6 +53,7 @@ exports.createGame = (req, res) => {
 exports.getAllGames = (req, res) => {
   try {
     const { sport_id, status } = req.query;
+    const userRole = req.user?.role || 'player';
 
     let sql = `
       SELECT g.*, 
@@ -65,6 +66,11 @@ exports.getAllGames = (req, res) => {
       WHERE 1=1
     `;
     const params = [];
+
+    // Non-admin users only see approved games
+    if (userRole !== 'admin') {
+      sql += ` AND g.approval_status = 'approved'`;
+    }
 
     if (sport_id) {
       sql += ' AND g.sport_id = ?';

@@ -36,12 +36,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.register(userData);
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
       setToken(token);
       setUser(user);
-      
-      return { success: true };
+
+      return { success: true, user };
     } catch (error) {
       return {
         success: false,
@@ -55,12 +55,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.login(credentials);
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
       setToken(token);
       setUser(user);
-      
-      return { success: true };
+
+      return { success: true, user };
     } catch (error) {
       return {
         success: false,
@@ -76,6 +76,11 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Helper functions for role checking
+  const isAdmin = () => user?.role === 'admin';
+  const isOrganizer = () => user?.role === 'organizer' || user?.role === 'admin';
+  const isPlayer = () => !!user;
+
   const value = {
     user,
     loading,
@@ -84,6 +89,9 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     loadUser,
+    isAdmin,
+    isOrganizer,
+    isPlayer,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

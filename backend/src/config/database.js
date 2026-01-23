@@ -10,7 +10,7 @@ let db = null;
 async function initDatabase() {
   try {
     const SQL = await initSqlJs();
-    
+
     // Check if database file exists
     if (fs.existsSync(dbPath)) {
       const buffer = fs.readFileSync(dbPath);
@@ -21,7 +21,7 @@ async function initDatabase() {
       console.log('✅ Created new database');
       createTables();
     }
-    
+
     return db;
   } catch (error) {
     console.error('❌ Database initialization error:', error);
@@ -37,9 +37,12 @@ function createTables() {
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         full_name TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
+        email TEXT,
+        registration_number TEXT UNIQUE,
         password TEXT NOT NULL,
         phone TEXT,
+        role TEXT DEFAULT 'player' CHECK(role IN ('player', 'organizer', 'admin')),
+        is_suspended INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -82,9 +85,13 @@ function createTables() {
         players_needed INTEGER NOT NULL,
         current_players INTEGER DEFAULT 0,
         status TEXT DEFAULT 'open',
+        approval_status TEXT DEFAULT 'pending' CHECK(approval_status IN ('pending', 'approved', 'rejected')),
+        reviewed_by INTEGER,
+        reviewed_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (sport_id) REFERENCES sports(id)
+        FOREIGN KEY (sport_id) REFERENCES sports(id),
+        FOREIGN KEY (reviewed_by) REFERENCES users(id)
       )
     `);
     console.log('✅ Games table created');
@@ -118,7 +125,7 @@ function createTables() {
 
     // Seed initial data
     seedInitialData();
-    
+
     // Save database to file
     saveDatabase();
   } catch (error) {
@@ -193,6 +200,21 @@ function seedInitialData() {
     }
   });
   console.log('✅ Locations data seeded');
+
+  // Seed admin user
+  const bcrypt = require('bcrypt');
+  const adminPassword = bcrypt.hashSync('admin123', 10);
+
+  try {
+    db.run(
+      `INSERT OR IGNORE INTO users (full_name, email, password, role) 
+       VALUES (?, ?, ?, ?)`,
+      ['System Administrator', 'admin@buk.edu.ng', adminPassword, 'admin']
+    );
+    console.log('✅ Admin user seeded (email: admin@buk.edu.ng, password: admin123)');
+  } catch (err) {
+    // Ignore if admin already exists
+  }
 
   saveDatabase();
 }

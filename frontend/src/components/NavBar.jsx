@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const NavBar = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, isOrganizer } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -13,13 +13,23 @@ const NavBar = () => {
     navigate('/login');
   };
 
-  const navLinks = [
+  // Base nav links for all users
+  const baseNavLinks = [
     { label: 'Dashboard', path: '/dashboard', icon: '🏠' },
     { label: 'Browse Games', path: '/games', icon: '🎮' },
-    { label: 'Create Game', path: '/create-game', icon: '➕' },
     { label: 'My Games', path: '/my-games', icon: '📋' },
     { label: 'Locations', path: '/locations', icon: '📍' },
   ];
+
+  // Add Create Game only for organizers
+  const navLinks = isOrganizer()
+    ? [
+      baseNavLinks[0],
+      baseNavLinks[1],
+      { label: 'Create Game', path: '/create-game', icon: '➕' },
+      ...baseNavLinks.slice(2)
+    ]
+    : baseNavLinks;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/20 backdrop-blur-3xl border-b border-white/30 shadow-2xl ring-1 ring-white/20">
@@ -41,8 +51,7 @@ const NavBar = () => {
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-2.5 text-white/80 font-semibold text-lg tracking-wide transition-all duration-300 hover:text-white hover:translate-y-[-2px] ${
-                    isActive ? 'text-white drop-shadow-lg' : ''
+                  `flex items-center gap-2.5 text-white/80 font-semibold text-lg tracking-wide transition-all duration-300 hover:text-white hover:translate-y-[-2px] ${isActive ? 'text-white drop-shadow-lg' : ''
                   }`
                 }
                 end
@@ -58,7 +67,7 @@ const NavBar = () => {
 
           {/* User Section + Mobile Menu Button */}
           <div className="flex items-center gap-6">
-            {/* Logout Button - */}
+            {/* Logout Button */}
             <button
               onClick={handleLogout}
               className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold py-2 px-5 rounded-2xl shadow-2xl hover:shadow-3xl hover:shadow-blue-500/60 transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-400/50 transition-all duration-300 text-base tracking-wide"
@@ -81,7 +90,7 @@ const NavBar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu  */}
+      {/* Mobile Menu */}
       <div className={`lg:hidden absolute top-full left-0 right-0 bg-blue-950/95 backdrop-blur-3xl border-b border-white/40 shadow-2xl transition-all duration-500 overflow-hidden ${isMobileMenuOpen ? 'max-h-96 py-6' : 'max-h-0 py-0'}`}>
         <div className="px-6 space-y-4">
           {navLinks.map((link) => (
@@ -90,8 +99,7 @@ const NavBar = () => {
               to={link.path}
               onClick={() => setIsMobileMenuOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-4 text-white/90 font-semibold text-xl py-3 px-5 rounded-2xl transition-all duration-300 hover:bg-white/20 hover:text-white ${
-                  isActive ? 'bg-white/20 text-white drop-shadow-lg' : ''
+                `flex items-center gap-4 text-white/90 font-semibold text-xl py-3 px-5 rounded-2xl transition-all duration-300 hover:bg-white/20 hover:text-white ${isActive ? 'bg-white/20 text-white drop-shadow-lg' : ''
                 }`
               }
               end

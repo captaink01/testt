@@ -9,7 +9,9 @@ import CreateGamePage from './pages/CreateGamePage';
 import GameDetailsPage from './pages/GameDetailsPage';
 import MyGamesPage from './pages/MyGamesPage';
 import LocationsPage from './pages/LocationsPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
@@ -20,57 +22,67 @@ function App() {
             {/* Public Routes */}
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<LoginPage />} />
-            
-            {/* Protected Routes */}
-            <Route 
-              path="/dashboard" 
+
+            {/* Protected Student Routes */}
+            <Route
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <DashboardPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/games" 
+            <Route
+              path="/games"
               element={
                 <ProtectedRoute>
                   <GamesPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/create-game" 
+            <Route
+              path="/create-game"
               element={
                 <ProtectedRoute>
                   <CreateGamePage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/games/:id" 
+            <Route
+              path="/games/:id"
               element={
                 <ProtectedRoute>
                   <GameDetailsPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/my-games" 
+            <Route
+              path="/my-games"
               element={
                 <ProtectedRoute>
                   <MyGamesPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/locations" 
+            <Route
+              path="/locations"
               element={
                 <ProtectedRoute>
                   <LocationsPage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            
+
+            {/* Admin Routes */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                <AdminRoute>
+                  <AdminDashboardPage />
+                </AdminRoute>
+              }
+            />
+
             {/* Default Route */}
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>

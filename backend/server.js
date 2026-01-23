@@ -15,10 +15,10 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: function(origin, callback) {
+  origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
-    
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Basic route for testing
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'Campus Sports Connect API',
     status: 'running',
     version: '1.0.0'
@@ -51,12 +51,14 @@ const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const gameRoutes = require('./src/routes/gameRoutes');
 const locationRoutes = require('./src/routes/locationRoutes');
+const adminRoutes = require('./src/routes/adminRoutes');
 
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/locations', locationRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Initialize database and start server
 async function startServer() {
@@ -64,7 +66,7 @@ async function startServer() {
     // Initialize database first
     await initDatabase();
     console.log('✅ Database initialized successfully');
-    
+
     // Start server
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);

@@ -54,9 +54,9 @@ const CreateGamePage = () => {
     setLoading(true);
     try {
       await gamesAPI.createGame(formData);
-      setSuccess("Game created successfully! 🎉");
+      setSuccess("Game created successfully Awaiting Admin Approval! 🎉");
       setTimeout(() => {
-        navigate("/games");
+        navigate("/my-games");
       }, 1500);
     } catch (error) {
       setError(error.response?.data?.message || "Failed to create game");
@@ -110,9 +110,8 @@ const CreateGamePage = () => {
                     </span>
                   </span>
                   <svg
-                    className={`w-6 h-6 text-white/70 transition-transform duration-300 ${
-                      sportDropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-6 h-6 text-white/70 transition-transform duration-300 ${sportDropdownOpen ? "rotate-180" : ""
+                      }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -164,9 +163,8 @@ const CreateGamePage = () => {
                     <span>{formData.location || "Select a location"}</span>
                   </span>
                   <svg
-                    className={`w-6 h-6 text-white/70 transition-transform duration-300 ${
-                      locationDropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-6 h-6 text-white/70 transition-transform duration-300 ${locationDropdownOpen ? "rotate-180" : ""
+                      }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

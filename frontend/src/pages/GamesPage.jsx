@@ -1,10 +1,12 @@
 // src/pages/GamesPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { gamesAPI, userAPI } from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 import Navbar from '../components/NavBar';
 
 const GamesPage = () => {
+  const { isOrganizer } = useContext(AuthContext);
   const [games, setGames] = useState([]);
   const [sports, setSports] = useState([]);
   const [selectedSport, setSelectedSport] = useState('');
@@ -41,9 +43,9 @@ const GamesPage = () => {
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      month: 'long', 
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
       day: 'numeric',
       year: 'numeric'
     }) + ` · ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
@@ -60,14 +62,22 @@ const GamesPage = () => {
           <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight drop-shadow-2xl">
             Browse Games
           </h1>
-          
-          
+
+          {/* Create Game Button - Only for Organizers */}
+          {isOrganizer() && (
+            <Link
+              to="/create-game"
+              className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl hover:shadow-3xl hover:shadow-blue-500/60 transform hover:-translate-y-1 transition-all duration-300 text-lg tracking-wide"
+            >
+              + Create Game
+            </Link>
+          )}
         </div>
 
         {/*  Sport Filter Dropdown */}
         <div className="relative max-w-md mb-12">
           <div className="text-xl font-bold text-white mb-4">Filter by Sport</div>
-          
+
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="w-full px-6 py-5 bg-white/20 border border-white/50 rounded-2xl text-white text-left flex items-center justify-between focus:outline-none focus:border-blue-400 focus:bg-white/30 focus:ring-4 focus:ring-blue-400/40 transition-all duration-300 backdrop-blur-sm shadow-inner text-lg font-medium hover:bg-white/25"
@@ -147,16 +157,15 @@ const GamesPage = () => {
                     <div className="text-6xl drop-shadow-2xl">
                       {game.sport_icon}
                     </div>
-                    <span className={`px-5 py-2 rounded-full text-lg font-bold tracking-wide backdrop-blur-sm ${
-                      displayedStatus === 'open' 
-                        ? 'bg-green-500/30 text-green-200 border border-green-400/50' 
-                        : 'bg-white/20 text-white/70 border border-white/40'
-                    }`}>
+                    <span className={`px-5 py-2 rounded-full text-lg font-bold tracking-wide backdrop-blur-sm ${displayedStatus === 'open'
+                      ? 'bg-green-500/30 text-green-200 border border-green-400/50'
+                      : 'bg-white/20 text-white/70 border border-white/40'
+                      }`}>
                       {displayedStatus.toUpperCase()}
                     </span>
                   </div>
 
-                 
+
                   <h3 className="text-2xl font-extrabold text-white mb-2 group-hover:text-blue-300 transition-colors duration-300 tracking-tight">
                     {game.title}
                   </h3>
