@@ -16,10 +16,21 @@ const NavBar = () => {
   const navLinks = [
     { label: 'Dashboard', path: '/dashboard', icon: '🏠' },
     { label: 'Browse Games', path: '/games', icon: '🎮' },
-    { label: 'Create Game', path: '/create-game', icon: '➕' },
+    {
+      label: 'Create Game',
+      path: '/create-game',
+      icon: '➕',
+      roles: ['student_creator', 'admin']
+    },
     { label: 'My Games', path: '/my-games', icon: '📋' },
     { label: 'Locations', path: '/locations', icon: '📍' },
-  ];
+    {
+      label: 'Admin Control',
+      path: '/admin',
+      icon: '🛡️',
+      roles: ['admin']
+    },
+  ].filter(link => !link.roles || link.roles.includes(user?.role));
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/20 backdrop-blur-3xl border-b border-white/30 shadow-2xl ring-1 ring-white/20">

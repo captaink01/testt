@@ -1,7 +1,7 @@
 // src/pages/DashboardPage.jsx
 import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { userAPI } from '../services/api';
+import { userAPI, authAPI } from '../services/api';
 import Navbar from '../components/NavBar';
 
 const DashboardPage = () => {
@@ -11,6 +11,11 @@ const DashboardPage = () => {
   const [selectedSports, setSelectedSports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+
+  // Admin section states
+  const [adminData, setAdminData] = useState({ full_name: '', email: '', password: '' });
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminMessage, setAdminMessage] = useState('');
 
   useEffect(() => {
     fetchSports();
@@ -59,6 +64,20 @@ const DashboardPage = () => {
     setLoading(false);
   };
 
+  const handleAdminSubmit = async (e) => {
+    e.preventDefault();
+    setAdminLoading(true);
+    setAdminMessage('');
+    try {
+      await authAPI.createAdmin(adminData);
+      setAdminMessage('New admin registered successfully!');
+      setAdminData({ full_name: '', email: '', password: '' });
+    } catch (error) {
+      setAdminMessage(error.response?.data?.message || 'Failed to register admin');
+    }
+    setAdminLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-900">
       <Navbar />
@@ -72,13 +91,81 @@ const DashboardPage = () => {
             Welcome back, {user?.full_name}!
           </h2>
           <div className="space-y-3 text-white/90 text-lg font-medium">
-            <p><span className="text-white/70">Email:</span> {user?.email}</p>
+            {user?.email && <p><span className="text-white/70">Email:</span> {user?.email}</p>}
+            {user?.reg_number && <p><span className="text-white/70">Reg No:</span> {user?.reg_number}</p>}
+            <p><span className="text-white/70">Role:</span> {
+              user?.role === 'admin' ? 'Administrator' :
+              user?.role === 'student_creator' ? 'Student (Creator)' : 'Student (Player)'
+            }</p>
             {user?.phone && <p><span className="text-white/70">Phone:</span> {user?.phone}</p>}
             <p className="text-white/70 text-base mt-6">
               Member since {new Date(user?.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
         </div>
+
+        {/* Admin Management Section */}
+        {user?.role === 'admin' && (
+          <div className="bg-white/25 backdrop-blur-3xl border border-white/40 rounded-3xl shadow-2xl ring-1 ring-white/20 p-8 md:p-12 mb-10 transition-all duration-500">
+            <h3 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-4">
+              Admin Management
+            </h3>
+            <p className="text-xl text-white/80 font-medium mb-10 max-w-4xl">
+              Create new administrator accounts to help manage and regulate campus games.
+            </p>
+
+            {adminMessage && (
+              <div className={`mb-8 p-5 rounded-2xl text-center font-bold text-lg backdrop-blur-sm border ${
+                adminMessage.includes('success') ? 'bg-green-500/20 border-green-400/50 text-green-200' : 'bg-red-500/20 border-red-500/50 text-red-200'
+              }`}>
+                {adminMessage}
+              </div>
+            )}
+
+            <form onSubmit={handleAdminSubmit} className="max-w-xl space-y-6">
+              <div>
+                <label className="block text-white font-bold mb-2">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={adminData.full_name}
+                  onChange={(e) => setAdminData({ ...adminData, full_name: e.target.value })}
+                  className="w-full px-6 py-4 bg-white/20 border border-white/50 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:bg-white/30 transition-all duration-300 backdrop-blur-sm"
+                  placeholder="Enter full name"
+                />
+              </div>
+              <div>
+                <label className="block text-white font-bold mb-2">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={adminData.email}
+                  onChange={(e) => setAdminData({ ...adminData, email: e.target.value })}
+                  className="w-full px-6 py-4 bg-white/20 border border-white/50 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:bg-white/30 transition-all duration-300 backdrop-blur-sm"
+                  placeholder="admin@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-white font-bold mb-2">Password</label>
+                <input
+                  type="password"
+                  required
+                  value={adminData.password}
+                  onChange={(e) => setAdminData({ ...adminData, password: e.target.value })}
+                  className="w-full px-6 py-4 bg-white/20 border border-white/50 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:bg-white/30 transition-all duration-300 backdrop-blur-sm"
+                  placeholder="Min. 6 characters"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={adminLoading}
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 rounded-2xl shadow-xl hover:shadow-blue-500/40 transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50"
+              >
+                {adminLoading ? 'Registering...' : 'Register New Admin'}
+              </button>
+            </form>
+          </div>
+        )}
 
         {/* Sports Preferences Section */}
         <div className="bg-white/25 backdrop-blur-3xl border border-white/40 rounded-3xl shadow-2xl ring-1 ring-white/20 p-8 md:p-12 transition-all duration-500">

@@ -10,21 +10,25 @@ const {
   joinGame,
   leaveGame,
   getMyGames,
-  getJoinedGames
+  getJoinedGames,
+  updateGameStatus
 } = require('../controllers/gameController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, isCreator, isAdmin, optionalAuth } = require('../middleware/authMiddleware');
 
 // Public routes
-router.get('/', getAllGames);
+router.get('/', optionalAuth, getAllGames);
 router.get('/:id', getGameById);
 
 // Protected routes (require authentication)
-router.post('/', protect, createGame);
+router.post('/', protect, isCreator, createGame);
 router.put('/:id', protect, updateGame);
 router.delete('/:id', protect, deleteGame);
 router.post('/:id/join', protect, joinGame);
 router.post('/:id/leave', protect, leaveGame);
 router.get('/my/created', protect, getMyGames);
 router.get('/my/joined', protect, getJoinedGames);
+
+// Admin routes
+router.patch('/:id/status', protect, isAdmin, updateGameStatus);
 
 module.exports = router;

@@ -8,7 +8,7 @@ const LoginPage = () => {
   const { login } = useContext(AuthContext);
   
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -57,16 +57,16 @@ const LoginPage = () => {
         <form onSubmit={handleSubmit} className="space-y-7">
           <div className="relative">
             <label className="block text-sm font-semibold text-white/95 mb-2">
-              Email
+              Email or Registration Number
             </label>
             <input
-              type="email"
-              name="email"
+              type="text"
+              name="identifier"
               required
-              value={formData.email}
+              value={formData.identifier}
               onChange={handleChange}
               className="w-full px-5 py-4 bg-white/20 border border-white/50 rounded-2xl text-white placeholder-white/60 focus:outline-none focus:border-blue-400 focus:bg-white/30 focus:ring-4 focus:ring-blue-400/40 transition-all duration-300 backdrop-blur-sm shadow-inner"
-              placeholder="your.email@buk.edu.ng"
+              placeholder="Email or Reg No (e.g. CST/21/SWE/00674)"
             />
           </div>
 

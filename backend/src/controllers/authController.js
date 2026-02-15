@@ -6,23 +6,36 @@ const { runQuery, getOne, saveDatabase } = require('../config/database');
 // Register new user
 exports.register = async (req, res) => {
   try {
-    const { full_name, email, password, phone } = req.body;
+    const { full_name, email, reg_number, password, phone, role } = req.body;
 
     // Validation
-    if (!full_name || !email || !password) {
+    if (!full_name || !password || (!email && !reg_number)) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide full name, email, and password'
+        message: 'Please provide full name, password, and either email or registration number'
       });
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide a valid email address'
-      });
+    // Email validation if provided
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide a valid email address'
+        });
+      }
+    }
+
+    // Reg number validation if provided
+    if (reg_number) {
+      const regRegex = /^[A-Z]{3}\/\d{2}\/[A-Z]{3}\/\d{5}$/;
+      if (!regRegex.test(reg_number)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid registration number format. Expected format: CST/21/SWE/00674'
+        });
+      }
     }
 
     // Password length check
@@ -34,12 +47,24 @@ exports.register = async (req, res) => {
     }
 
     // Check if user already exists
-    const existingUser = getOne('SELECT * FROM users WHERE email = ?', [email]);
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'User with this email already exists'
-      });
+    if (email) {
+      const existingUser = getOne('SELECT * FROM users WHERE email = ?', [email]);
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'User with this email already exists'
+        });
+      }
+    }
+
+    if (reg_number) {
+      const existingUser = getOne('SELECT * FROM users WHERE reg_number = ?', [reg_number]);
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'User with this registration number already exists'
+        });
+      }
     }
 
     // Hash password
@@ -47,9 +72,10 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Insert user into database
+    const userRole = role || 'student_player';
     const result = runQuery(
-      'INSERT INTO users (full_name, email, password, phone) VALUES (?, ?, ?, ?)',
-      [full_name, email, hashedPassword, phone || null]
+      'INSERT INTO users (full_name, email, reg_number, password, phone, role) VALUES (?, ?, ?, ?, ?, ?)',
+      [full_name, email || null, reg_number || null, hashedPassword, phone || null, userRole]
     );
 
     if (!result.success) {
@@ -60,12 +86,14 @@ exports.register = async (req, res) => {
     }
 
     // Get the newly created user
-    const newUser = getOne('SELECT id, full_name, email, phone, created_at FROM users WHERE email = ?', [email]);
+    const newUser = reg_number
+      ? getOne('SELECT id, full_name, email, reg_number, role, phone, created_at FROM users WHERE reg_number = ?', [reg_number])
+      : getOne('SELECT id, full_name, email, reg_number, role, phone, created_at FROM users WHERE email = ?', [email]);
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: newUser.id, email: newUser.email },
-      process.env.JWT_SECRET,
+      { userId: newUser.id, email: newUser.email, reg_number: newUser.reg_number, role: newUser.role },
+      process.env.JWT_SECRET || 'fallback_secret_key_12345',
       { expiresIn: '7d' }
     );
 
@@ -86,26 +114,94 @@ exports.register = async (req, res) => {
   }
 };
 
-// Login user
-exports.login = async (req, res) => {
+// Create a new admin user (Protected: Admin only)
+exports.createAdmin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { full_name, email, password } = req.body;
 
-    // Validation
-    if (!email || !password) {
+    if (!full_name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password'
+        message: 'Please provide full name, email, and password'
       });
     }
 
-    // Find user
-    const user = getOne('SELECT * FROM users WHERE email = ?', [email]);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long'
+      });
+    }
+
+    const existingUser = getOne('SELECT * FROM users WHERE email = ?', [email]);
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const result = runQuery(
+      'INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)',
+      [full_name, email, hashedPassword, 'admin']
+    );
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to create admin account'
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Admin account created successfully'
+    });
+
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during registration',
+      error: error.message
+    });
+  }
+};
+
+// Login user
+exports.login = async (req, res) => {
+  try {
+    const { email, reg_number, identifier, password } = req.body;
+
+    // Support both direct email/reg_number or a generic identifier
+    const loginId = identifier || email || reg_number;
+
+    // Validation
+    if (!loginId || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email/registration number and password'
+      });
+    }
+
+    // Find user by email or reg_number
+    const user = getOne('SELECT * FROM users WHERE email = ? OR reg_number = ?', [loginId, loginId]);
     
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Invalid credentials'
       });
     }
 
@@ -121,8 +217,8 @@ exports.login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      process.env.JWT_SECRET,
+      { userId: user.id, email: user.email, reg_number: user.reg_number, role: user.role },
+      process.env.JWT_SECRET || 'fallback_secret_key_12345',
       { expiresIn: '7d' }
     );
 
@@ -153,7 +249,7 @@ exports.getProfile = (req, res) => {
 
     // Get user info
     const user = getOne(
-      'SELECT id, full_name, email, phone, created_at FROM users WHERE id = ?',
+      'SELECT id, full_name, email, reg_number, role, phone, created_at FROM users WHERE id = ?',
       [userId]
     );
 

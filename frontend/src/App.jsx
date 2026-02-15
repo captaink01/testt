@@ -9,6 +9,7 @@ import CreateGamePage from './pages/CreateGamePage';
 import GameDetailsPage from './pages/GameDetailsPage';
 import MyGamesPage from './pages/MyGamesPage';
 import LocationsPage from './pages/LocationsPage';
+import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -69,6 +70,14 @@ function App() {
                   <LocationsPage />
                 </ProtectedRoute>
               } 
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
             />
             
             {/* Default Route */}

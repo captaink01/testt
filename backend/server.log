@@ -1,0 +1,37 @@
+[dotenv@17.2.3] injecting env (2) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+✅ Created new database
+✅ Users table created
+✅ Sports table created
+✅ User sports table created
+✅ Games table created
+✅ Game participants table created
+✅ Locations table created
+✅ Database initialized successfully
+🚀 Server running on http://localhost:5000
+📊 API Health: http://localhost:5000/api/health
+🔐 Auth endpoints:
+   - POST http://localhost:5000/api/auth/register
+   - POST http://localhost:5000/api/auth/login
+   - GET  http://localhost:5000/api/auth/profile
+👤 User endpoints:
+   - GET  http://localhost:5000/api/users/sports
+   - GET  http://localhost:5000/api/users/my-sports
+   - PUT  http://localhost:5000/api/users/sports-preferences
+   - PUT  http://localhost:5000/api/users/profile
+🎮 Game endpoints:
+   - GET  http://localhost:5000/api/games
+   - POST http://localhost:5000/api/games
+   - GET  http://localhost:5000/api/games/:id
+   - PUT  http://localhost:5000/api/games/:id
+   - POST http://localhost:5000/api/games/:id/join
+   - POST http://localhost:5000/api/games/:id/leave
+   - GET  http://localhost:5000/api/games/my/created
+   - GET  http://localhost:5000/api/games/my/joined
+📍 Location endpoints:
+   - GET  http://localhost:5000/api/locations
+   - GET  http://localhost:5000/api/locations/:id
+✅ Admin user seeded (admin@buk.edu.ng / adminpassword123)
+✅ Sports data seeded
+✅ Locations data seeded
+✅ Database saved to file
+✅ Database saved to file

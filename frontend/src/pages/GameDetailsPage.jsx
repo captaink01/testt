@@ -74,7 +74,7 @@ const GameDetailsPage = () => {
     }
   };
 
-  const isCreator = user?.id === game?.creator_id;
+  const isCreator = user?.id === game?.creator_id || user?.role === 'admin';
   const isParticipant = game?.participants?.some(p => p.id === user?.id);
   const isFull = game?.current_players >= game?.players_needed;
   const displayedStatus = isFull ? 'closed' : game?.status;
